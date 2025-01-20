@@ -47,7 +47,7 @@ matches = np.where(ncc_map >= threshold)
 for match in zip(matches[0], matches[1]):
     top_left = match[1], match[0]
     bottom_right = top_left[0] + tem_w, top_left[1] + tem_h
-
+    
     cv2.rectangle(Original_img, top_left, bottom_right, (0, 255, 0), 2)
 cv2.imshow('template', Original_img)
 cv2.waitKey(0)
