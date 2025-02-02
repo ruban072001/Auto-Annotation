@@ -35,16 +35,31 @@ for i in range(1, h+1):
         grad_y = kernel_y * roi
         
         gradient_y[i-1, j-1] = np.sum(grad_y)
-# print(f"gradient:  {gradient_x}")
-result_x = cv2.convertScaleAbs(gradient_x)
-result_y = cv2.convertScaleAbs(gradient_y)
-# print(f"result:  {result_x}")
+result_x = cv2.convertScaleAbs(gradient_x) 
+result_y = cv2.convertScaleAbs(gradient_y) 
+Ixx = result_x ** 2
+Iyy = result_y ** 2
+Ixy = Ixx * Iyy
+R = np.zeros_like(gray_img)
+k = 0.04
+threshold = 0.01
+for i in range(1, h - 1):
+    for j in range(1, w - 1):
+        sxx = Ixx[i-1:i+2, j-1: j+2].sum()
+        syy = Iyy[i-1:i+2, j-1: j+2].sum()
+        sxy = Ixy[i-1:i+2, j-1: j+2].sum()
+        
+        det = (sxx * syy) - (sxy ** 2)
+        trace = sxx + syy
+        R[i, j] = det - k * (trace ** 2)
+R = cv2.normalize(R, None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
 
-
-# cv2.imshow("gray img", gray_img)
-# cv2.imshow("gradient_x", gradient_x)
-# cv2.imshow("gradient_y", gradient_y)
-# cv2.imshow("result_x", result_x)
-# cv2.imshow("result_y", result_y)
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
+keypoints = np.argwhere(R > threshold)
+print(keypoints)
+cv2.imshow("gray img", gray_img)
+cv2.imshow("gradient_x", gradient_x)
+cv2.imshow("gradient_y", gradient_y)
+cv2.imshow("result_x", result_x)
+cv2.imshow("result_y", result_y)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
